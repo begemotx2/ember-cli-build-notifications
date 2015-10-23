@@ -8,20 +8,19 @@ module.exports = {
   name: 'ember-cli-build-notifications',
 
   postBuild: function(result){
-    var seconds = result.totalTime / 1000000000;
-    notifier.notify({
-      title: 'Build success',
-      message: 'Build time: ' + (Math.round(seconds * 100) / 100) + ' seconds',
-      appIcon: path.resolve(__dirname + '/ember-logo.png'),
-      'expire-time': 1000
-    });
+    var config = Config.load(this.project.root);
+    if (config.postBuild.notify) {
+      var seconds = result.totalTime / 1000000000;
+      var message = 'Build time: ' + (Math.round(seconds * 100) / 100) + ' seconds';
+      notifier.success(message, {timeout: config.postBuild.timeout});
+    }
   },
 
   buildError: function(error) {
     var config = Config.load(this.project.root);
 
     if (config.buildError.notify) {
-      notifier.notify(error);
+      notifier.error(error);
     }
   }
 };
